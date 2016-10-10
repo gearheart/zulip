@@ -41,7 +41,7 @@ from zerver.lib.str_utils import force_text, force_str
 import six
 from six.moves import range, html_parser
 from six import text_type
-from webpreview import web_preview, WebpreviewException
+from webpreview import web_preview
 
 if six.PY3:
     import html
@@ -594,8 +594,8 @@ class InlineInterestingLinkProcessor(markdown.treeprocessors.Treeprocessor):
 
             try:
                 title, description, image = web_preview(url)
-            except WebpreviewException:
-                pass
+            except:
+                continue
             else:
                 if title:
                     add_embed(root, url, title, description, image)
