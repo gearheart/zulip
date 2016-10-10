@@ -3689,3 +3689,18 @@ a#undo_markdown_preview {
 #markdown_preview_spinner {
     margin: auto;
 }
+
+
+// embed
+.message_embed {
+    border-left: 4px solid #ccc;
+    padding-left: 5px;
+    display: block;
+    margin-bottom: 10px;
+}
+.message_embed_title {
+    font-weight: bold;
+}
+.message_embed_image {
+    max-width: 80px;
+}
