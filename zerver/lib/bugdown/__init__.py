@@ -41,6 +41,7 @@ from zerver.lib.str_utils import force_text, force_str
 import six
 from six.moves import range, html_parser
 from six import text_type
+from webpreview import web_preview
 
 if six.PY3:
     import html
@@ -121,6 +122,30 @@ def add_a(root, url, link, height="", title=None, desc=None,
         title_div.text = title
         desc_div = markdown.util.etree.SubElement(summary_div, "desc")
         desc_div.set("class", "message_inline_image_desc")
+
+
+def add_embed(root, link, title, description=None, img_link=None):
+    container = markdown.util.etree.SubElement(root, "div")
+    container.set("class", "message_embed")
+
+    title_elm = markdown.util.etree.SubElement(container, "div")
+    title_elm.set("class", "message_embed_title")
+    a = markdown.util.etree.SubElement(title_elm, "a")
+    a.set("href", link)
+    a.set("target", "_blank")
+    a.set("title", title)
+    a.text = title
+
+    if description:
+        description_elm = markdown.util.etree.SubElement(container, "div")
+        description_elm.set("class", "message_embed_description")
+        description_elm.text = description
+
+    if img_link:
+        img = markdown.util.etree.SubElement(container, "img")
+        img.set("src", img_link)
+        img.set("class", "message_embed_image")
+
 
 @cache_with_key(lambda tweet_id: tweet_id, cache_name="database", with_statsd_key="tweet_data")
 def fetch_tweet_data(tweet_id):
@@ -566,6 +591,15 @@ class InlineInterestingLinkProcessor(markdown.treeprocessors.Treeprocessor):
             if youtube is not None:
                 add_a(root, youtube, url)
                 continue
+
+            try:
+                title, description, image = web_preview(url)
+            except:
+                continue
+            else:
+                if title:
+                    add_embed(root, url, title, description, image)
+
 
 class Avatar(markdown.inlinepatterns.Pattern):
     def handleMatch(self, match):
@@ -1181,7 +1215,7 @@ def do_convert(md, realm_domain=None, message=None, possible_words=None):
         # Spend at most 5 seconds rendering.
         # Sometimes Python-Markdown is really slow; see
         # https://trac.zulip.net/ticket/345
-        return timeout(5, _md_engine.convert, md)
+        return timeout(60, _md_engine.convert, md)
     except:
         from zerver.lib.actions import internal_send_message
 

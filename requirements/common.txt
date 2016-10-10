@@ -159,3 +159,7 @@ git+https://github.com/lorenzogil/glue@01c00cd33b9b78ea868300c266c16acd59a81bfc#
 
 # Needed for cloning virtual environments
 git+https://github.com/umairwaheed/virtualenv-clone.git@short-version#egg=virtualenv-clone==0.2.6
+
+# Needed for getting the meta informations of a webpage and embed its content
+beautifulsoup4==4.4.1
+-e git+https://github.com/ludbek/webpreview.git@da49e6f#egg=webpreview
